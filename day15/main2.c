@@ -45,29 +45,26 @@ int main(){
    }
 
    //go through data
-   int capacity, durability, flavor, texture, cals;
-   int score, max_score = 0;
+   int properties_data[5];
+   int score = 1, max_score = 0;
    for(int a = 0; a <= 100; a++){
       for(int b = 0; b <= 100; b++){
          for(int c = 0; c <= 100; c++){
             int d = 100 - a - b - c;
 
-            capacity =  a * properties[0][0] + b * properties[1][0] + c * properties[2][0] + d * properties[3][0];
-            durability =a * properties[0][1] + b * properties[1][1] + c * properties[2][1] + d * properties[3][1];
-            flavor =    a * properties[0][2] + b * properties[1][2] + c * properties[2][2] + d * properties[3][2];
-            texture =   a * properties[0][3] + b * properties[1][3] + c * properties[2][3] + d * properties[3][3];
-            cals =      a * properties[0][4] + b * properties[1][4] + c * properties[2][4] + d * properties[3][4];
+            for(int i = 0; i < 5; i++){
+               properties_data[i] = a * properties[0][i] + b * properties[1][i] + c * properties[2][i] + d * properties[3][i];
+               properties_data[i] = MAX(properties_data[i], 0);
 
-            capacity = MAX(capacity, 0);
-            durability = MAX(durability, 0);
-            flavor = MAX(flavor, 0);
-            texture = MAX(texture, 0);
-            cals = MAX(cals, 0);
+               if(i < 4){ //don't count calories to score
+                  score = score * properties_data[i];
+               }
+            }
 
-            score = capacity * durability * flavor * texture;
-            if((cals <= 500) && (score > max_score)){
+            if((properties_data[4] <= 500) && (score > max_score)){
                max_score = score;
             }
+            score = 1;
          }
       }
    }
