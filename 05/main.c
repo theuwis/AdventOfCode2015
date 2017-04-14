@@ -3,66 +3,55 @@
 #include <string.h>
 #include <stdbool.h>
 
+int main(void){
+	//start parsing the data
+	FILE * fp_data;
+	fp_data = fopen("data", "r");
+	char * data_read = NULL;
+	size_t len = 0;
+	ssize_t read;
 
-bool checks[3] = {false, false, true}; //3 vowels, letter twice, not string ab...
-int counter = 0, vowel_counter = 0, nice_strings = 0;
-char c = 'a', data[100];
-
-int main() {
-   FILE * fp_data;
-   fp_data = fopen("data", "r");
-
-   //TODO fout in de while loop ==> wilt niet printen op het einde (antwoord is 258 btw)
-   while(1){
-      counter = 0;
-      while( ((c = fgetc(fp_data)) != '\n') ){
-         data[counter] = c;
-         counter++;
-
-      }
-//      if(c == EOF){
-//         printf("END\n");
-//         return 0;
-//      }
-      data[counter] = '\0';
-
-      //printf("%s\n", data);
-
-      for(int i = 0; i < (strlen(data) - 1); i++){
-         c = data[i];
-
-         if(c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u'){
-            vowel_counter++;
-
-            if(vowel_counter >= 3){
-               checks[0] = true;
-            }
-         }
-
-         if(c == data[i + 1]){
-            checks[1] = true;
-         }
-
-         if( (c == 'a' && data[i + 1] == 'b') || (c == 'c' && data[i + 1] == 'd') ||
-             (c == 'p' && data[i + 1] == 'q') || (c == 'x' && data[i + 1] == 'y') ){
-            checks[2] = false;
-         }
-      }
-
-      if(checks[0] && checks[1] && checks[2]){
-         nice_strings++;
-      }
-
-      checks[0] = false;
-      checks[1] = false;
-      checks[2] =  true;
-      vowel_counter = 0;
-   //   printf("%d\n", nice_strings);
-   }
-
-   printf("%d\n", nice_strings);
-   printf("lalalalalaal\n");
+	int current_char = 0, nr_nice_strings = 0;
+	int nr_vowels = 0;
+	bool twice_row = false, banned_string = false;
 
 
-   return 0;
+	while((read = getline(&data_read, &len, fp_data)) != -1){
+		//check all the conditions
+		while(data_read[current_char] != '\0'){
+			//count amount of vowels
+			if((data_read[current_char] == 'a') || (data_read[current_char] == 'e') || 
+				(data_read[current_char] == 'i') || (data_read[current_char] == 'o') || 
+				(data_read[current_char] == 'u')){
+				nr_vowels++;
+			}
+
+			//check if letter twice in a row (exclude first char!)
+			if((current_char > 0) && (data_read[current_char] == data_read[current_char - 1])){
+				twice_row = true;
+			}
+			
+			current_char++;
+		}
+
+		//check for bad strings
+		if((strstr(data_read, "ab") != NULL) || (strstr(data_read, "cd") != NULL) || 
+			(strstr(data_read, "pq") != NULL) || (strstr(data_read, "xy") != NULL)){
+			banned_string = true;
+		}
+
+		//test all conditions
+		if((nr_vowels >= 3) && twice_row && !banned_string){
+			nr_nice_strings++;
+		}
+
+		nr_vowels = 0;
+		current_char = 0;
+		twice_row = false;
+		banned_string = false;
+	}
+
+	printf("answer=%d\n", nr_nice_strings);
+
+	return EXIT_SUCCESS;
 }
